@@ -12,7 +12,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         unique: true,
         allowNull: false,
-        comment: "Unique Google account ID",
       },
       email: {
         type: DataTypes.STRING,
