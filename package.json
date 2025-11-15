@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Simple fileshare via shortlink app with Google OAuth login",
   "scripts": {
-    "start": "node app.js",
+    "start": "npm run migrate && node app.js",
+    "migrate": "sequelize-cli db:migrate",
     "dev": "nodemon app.js"
   },
   "dependencies": {
