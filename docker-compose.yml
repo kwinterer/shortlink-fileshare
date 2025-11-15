@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    container_name: shortlink-app
+    ports:
+      - "3000:3000"
+    volumes:      
+      - db_data:/usr/src/app/data
+      - uploads_data:/usr/src/app/uploads
+volumes:
+  db_data:
+  uploads_data:

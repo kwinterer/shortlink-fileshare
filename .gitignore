@@ -12,6 +12,7 @@ yarn-error.log*
 
 # SQLite database (ignore local dev DB)
 database.sqlite
+data/
 
 # Uploads (user-generated files, not source code)
 uploads/
