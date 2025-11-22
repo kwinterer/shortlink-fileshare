@@ -1,7 +1,7 @@
 # 📁 Personal Project: Shortlink Fileshare application
 Node.js/Express.js application with Google OAuth authentication and short url generation
 
-![Node.js](https://img.shields.io/badge/node.js-v14+-green)
+![Node.js](https://img.shields.io/badge/node.js-v22+-green)
 ![Express](https://img.shields.io/badge/express-4.x-blue)
 ![Sequelize](https://img.shields.io/badge/sequelize-6.x-orange)
 
