@@ -12,7 +12,7 @@ Node.js/Express.js application with Google OAuth authentication and short url ge
 - 🔗 **Shortlink Generation**
 - 📊 **File Management Dashboard**
 - 🗄️ **Database Agnostic** - SQLite for development, easily switch to PostgreSQL/MySQL
-
+- 🚀 **Dockerfile included**
 ### Prerequisites
 
 - Node.js v22 or higher
