@@ -9,6 +9,7 @@ const authRoutes = require("./routes/auth");
 const fileRoutes = require("./routes/file");
 
 const app = express();
+const HOST = process.env.HOST || "127.0.0.1";
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -57,7 +58,7 @@ const startServer = async () => {
   try {
     await sequelize.authenticate();
 
-    app.listen(PORT, () => {
+    app.listen(PORT,HOST, () => {
       console.log("=".repeat(50));
       console.log(`✓ Server running on port ${PORT}`);
       console.log(`✓ Environment: ${process.env.NODE_ENV || "development"}`);

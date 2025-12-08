@@ -8,18 +8,47 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      type: {
+        type: DataTypes.ENUM('oauth', 'guest'),
+        allowNull: false,
+        validate: {
+          isIn: {
+            args: [['oauth', 'guest']],
+            msg: 'Type must be either oauth or guest'
+          }
+        }
+      },
       googleId: {
         type: DataTypes.STRING,
         unique: true,
-        allowNull: false,
+        allowNull: true,
+        validate: {
+          // Custom validator for OAuth users
+          isRequiredForOAuth(value) {
+            if (this.type === 'oauth' && !value) {
+              throw new Error('googleId is required for OAuth users');
+            }
+          }
+        }
       },
       email: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true,
         validate: {
           isEmail: true,
-        },
+          isRequiredForOAuth(value) {
+            if (this.type === 'oauth' && !value) {
+              throw new Error('email is required for OAuth users');
+            }
+          }
+        }
+      },
+      accessCode:{
+        type: DataTypes.STRING,
+        unique: true,
+        defaultValue: null,
+        allowNull: true
       },
       lastLogin: {
         type: DataTypes.DATE,
@@ -29,11 +58,43 @@ module.exports = (sequelize, DataTypes) => {
     {
       tableName: "users",
       timestamps: true,
+      validate: {
+        // Model-level validator
+        guestOrOAuth() {
+          // OAuth users MUST have googleId and email
+          if (this.type === 'oauth' && (!this.googleId || !this.email)) {
+            throw new Error('OAuth users must have both googleId and email');
+          }
+
+          // Guest users MUST NOT have googleId or email
+          if (this.type === 'guest' && (this.googleId || this.email)) {
+            throw new Error('Guest users cannot have googleId or email');
+          }
+        }
+      }
     },
   );
 
+    // Add custom instance methods
+  User.prototype.isGuestUser = function() {
+    return this.type === 'guest';
+  };
+
+  User.prototype.isOAuthUser = function() {
+    return this.type === 'oauth';
+  };
+
+  // Add static methods
+  User.findGuests = function() {
+    return this.findAll({ where: { type: 'guest' } });
+  };
+
+  User.findOAuthUsers = function() {
+    return this.findAll({ where: { type: 'oauth' } });
+  };
+
   User.associate = function (models) {
-    User.hasMany(models.File, { foreignKey: "userId", as: "files" });
+    User.hasMany(models.File, { foreignKey: "userId", as: "files", onDelete: 'CASCADE' });
   };
 
   return User;

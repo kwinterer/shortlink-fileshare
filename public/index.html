@@ -1,9 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>File Upload App</title>
+    <title>Shortlink Fileshare</title>
     <style>
       * {
         margin: 0;
@@ -12,9 +12,8 @@
       }
 
       body {
-        font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
-          Cantarell, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
         display: flex;
@@ -49,6 +48,176 @@
         font-size: 1.1em;
       }
 
+      /* NEW: Styles for guest and access code features */
+      .auth-options {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 10px 0;
+        color: #999;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .divider span {
+        padding: 0 15px;
+      }
+
+      .guest-section {
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 15px;
+        border: 2px dashed #ddd;
+      }
+
+      .guest-section h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.1em;
+      }
+
+      .guest-form {
+        display: flex;
+        gap: 10px;
+      }
+
+      .guest-input {
+        flex: 1;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1em;
+      }
+
+      .guest-btn {
+        background: #ff9800;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: all 0.3s;
+        white-space: nowrap;
+      }
+
+      .guest-btn:hover {
+        background: #f57c00;
+      }
+
+      .access-code-screen {
+        display: none;
+        text-align: center;
+        padding: 60px 20px;
+      }
+
+      .access-code-screen h2 {
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .access-code-screen p {
+        color: #666;
+        margin-bottom: 30px;
+      }
+
+      .access-code-form {
+        max-width: 400px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .access-code-input {
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1.1em;
+        text-align: center;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+
+      .submit-btn {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1em;
+        transition: all 0.3s;
+      }
+
+      .submit-btn:hover {
+        background: #45a049;
+      }
+
+      .back-btn {
+        background: #f44336;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: all 0.3s;
+      }
+
+      .back-btn:hover {
+        background: #d32f2f;
+      }
+
+      .error-message {
+        background: #ffebee;
+        color: #c62828;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 15px;
+        display: none;
+      }
+
+      .auth-options {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 10px 0;
+        color: #999;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .divider span {
+        padding: 0 15px;
+      }
+
       .google-btn {
         background: #4285f4;
         color: white;
@@ -59,6 +228,7 @@
         cursor: pointer;
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 10px;
         transition: all 0.3s;
         text-decoration: none;
@@ -68,6 +238,121 @@
         background: #357ae8;
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(66, 133, 244, 0.4);
+      }
+
+      .guest-section {
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 15px;
+        border: 2px dashed #ddd;
+      }
+
+      .guest-section h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.1em;
+      }
+
+      .guest-form {
+        display: flex;
+        gap: 10px;
+      }
+
+      .guest-input {
+        flex: 1;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1em;
+      }
+
+      .guest-btn {
+        background: #ff9800;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: all 0.3s;
+        white-space: nowrap;
+      }
+
+      .guest-btn:hover {
+        background: #f57c00;
+      }
+
+      .access-code-screen {
+        display: none;
+        text-align: center;
+        padding: 60px 20px;
+      }
+
+      .access-code-screen h2 {
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .access-code-screen p {
+        color: #666;
+        margin-bottom: 30px;
+      }
+
+      .access-code-form {
+        max-width: 400px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .access-code-input {
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1.1em;
+        text-align: center;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+
+      .submit-btn {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1em;
+        transition: all 0.3s;
+      }
+
+      .submit-btn:hover {
+        background: #45a049;
+      }
+
+      .back-btn {
+        background: #f44336;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: all 0.3s;
+      }
+
+      .back-btn:hover {
+        background: #d32f2f;
+      }
+
+      .error-message {
+        background: #ffebee;
+        color: #c62828;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 15px;
+        display: none;
       }
 
       .app-screen {
@@ -93,6 +378,22 @@
         width: 50px;
         height: 50px;
         border-radius: 50%;
+        background: #667eea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5em;
+        font-weight: bold;
+      }
+
+      .guest-badge {
+        background: #ff9800;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: bold;
       }
 
       .logout-btn {
@@ -338,6 +639,51 @@
           </svg>
           Sign in with Google
         </a>
+        <!-- NEW: Divider -->
+        <div class="divider"><span>OR</span></div>
+
+        <!-- NEW: Guest login section -->
+        <div class="guest-section">
+          <h3>🎭 Try as Guest</h3>
+          <p style="font-size: 0.9em; color: #666; margin-bottom: 15px">
+            Perfect for demos and quick tests
+          </p>
+          <form class="guest-form" onsubmit="handleGuestLogin(event)">
+            <input
+              type="text"
+              id="guestCodeInput"
+              class="guest-input"
+              placeholder="Enter guest code"
+              required
+            />
+            <button type="submit" class="guest-btn">Continue</button>
+          </form>
+          <div id="guestError" class="error-message"></div>
+        </div>
+      </div>
+
+      <!-- NEW: Access Code Screen (shown for new Google users) -->
+      <div id="accessCodeScreen" class="access-code-screen">
+        <h2>🔐 Access Code Required</h2>
+        <p>Please enter your invitation code to complete registration</p>
+
+        <form class="access-code-form" onsubmit="handleAccessCode(event)">
+          <input
+            type="text"
+            id="accessCodeInput"
+            class="access-code-input"
+            placeholder="Enter access code"
+            required
+          />
+          <button type="submit" class="submit-btn">
+            Complete Registration
+          </button>
+          <button type="button" class="back-btn" onclick="cancelRegistration()">
+            Cancel
+          </button>
+        </form>
+
+        <div id="accessCodeError" class="error-message"></div>
       </div>
 
       <!-- App Screen -->
@@ -417,7 +763,13 @@
           const response = await fetch("/auth/status");
           const data = await response.json();
 
-          if (data.authenticated) {
+          // Check for URL parameters
+          const urlParams = new URLSearchParams(window.location.search);
+          const requireAccessCode = urlParams.get("requireAccessCode");
+
+          if (requireAccessCode === "true" || data.requireAccessCode) {
+            showAccessCodeScreen();
+          } else if (data.authenticated) {
             currentUser = data.user;
             showAppScreen();
             loadUserFiles();
@@ -432,15 +784,95 @@
 
       function showLoginScreen() {
         document.getElementById("loginScreen").style.display = "block";
+        document.getElementById("accessCodeScreen").style.display = "none";
+        document.getElementById("appScreen").style.display = "none";
+      }
+
+      function showAccessCodeScreen() {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("accessCodeScreen").style.display = "block";
         document.getElementById("appScreen").style.display = "none";
       }
 
       function showAppScreen() {
         document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("accessCodeScreen").style.display = "none";
         document.getElementById("appScreen").style.display = "block";
 
         // Display user info
-        document.getElementById("userEmail").textContent = currentUser.email;
+        document.getElementById("userEmail").textContent =
+          currentUser.email || "";
+
+        // Show guest badge if applicable
+        if (currentUser.type == 'guest') {
+          document.getElementById("guestBadge").style.display = "block";
+        }
+      }
+
+      async function handleGuestLogin(event) {
+        event.preventDefault();
+
+        const guestCode = document.getElementById("guestCodeInput").value;
+        const errorDiv = document.getElementById("guestError");
+
+        try {
+          const response = await fetch("/auth/guest", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ guestCode }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            currentUser = data.user;
+            showAppScreen();
+            loadUserFiles();
+          } else {
+            errorDiv.textContent = data.error || "Invalid guest code";
+            errorDiv.style.display = "block";
+          }
+        } catch (error) {
+          console.error("Guest login error:", error);
+          errorDiv.textContent = "Login failed. Please try again.";
+          errorDiv.style.display = "block";
+        }
+      }
+
+      async function handleAccessCode(event) {
+        event.preventDefault();
+
+        const accessCode = document.getElementById("accessCodeInput").value;
+        const errorDiv = document.getElementById("accessCodeError");
+
+        try {
+          const response = await fetch("/auth/complete-registration", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ accessCode }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            currentUser = data.user;
+            // Clear URL parameters
+            window.history.replaceState({}, document.title, "/");
+            showAppScreen();
+            loadUserFiles();
+          } else {
+            errorDiv.textContent = data.error || "Invalid access code";
+            errorDiv.style.display = "block";
+          }
+        } catch (error) {
+          console.error("Access code error:", error);
+          errorDiv.textContent = "Registration failed. Please try again.";
+          errorDiv.style.display = "block";
+        }
+      }
+
+      function cancelRegistration() {
+        window.location.href = "/";
       }
 
       async function logout() {
@@ -514,8 +946,9 @@
           document.getElementById("loadingIndicator").style.display = "none";
 
           // Show success message
-          document.getElementById("uploadedFileName").textContent =
-            `File: ${data.file.originalName} (${formatFileSize(data.file.fileSize)})`;
+          document.getElementById("uploadedFileName").textContent = `File: ${
+            data.file.originalName
+          } (${formatFileSize(data.file.fileSize)})`;
           document.getElementById("shortLinkInput").value = data.file.accessUrl;
           document.getElementById("uploadResult").style.display = "block";
 
@@ -576,13 +1009,19 @@
             ${formatFileSize(file.fileSize)} • ${date}
           </div>
           <div class="file-actions">
-            <button class="file-btn btn-copy" onclick="copyFileLink('${file.accessUrl}')">
+            <button class="file-btn btn-copy" onclick="copyFileLink('${
+              file.accessUrl
+            }')">
               Copy Link
             </button>
-            <button class="file-btn btn-open" onclick="window.open('${file.accessUrl}', '_blank')">
+            <button class="file-btn btn-open" onclick="window.open('${
+              file.accessUrl
+            }', '_blank')">
               Open
             </button>
-            <button class="file-btn btn-delete" onclick="deleteFile('${file.shortlink}')">
+            <button class="file-btn btn-delete" onclick="deleteFile(${
+              file.shortlink
+            })">
               Delete
             </button>
           </div>

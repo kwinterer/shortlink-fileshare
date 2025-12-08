@@ -4,3 +4,4 @@ uploads
 data
 database.sqlite
 .vscode
+.env

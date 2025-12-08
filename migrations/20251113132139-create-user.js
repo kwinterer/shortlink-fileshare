@@ -11,15 +11,26 @@ module.exports = {
         autoIncrement: true,
         allowNull: false,
       },
+      type:{
+        type: Sequelize.ENUM('oauth', 'guest'),
+        allowNull: false,
+        defaultValue: 'oauth'
+      },
       googleId: {
         type: Sequelize.STRING,
         unique: true,
-        allowNull: false,
+        allowNull: true,
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true,
+      },
+      accessCode:{
+        type: Sequelize.STRING,
+        unique: true,
+        defaultValue: null,
+        allowNull: true
       },
       lastLogin: {
         type: Sequelize.DATE,
