@@ -1,64 +1,37 @@
 const express = require("express");
-const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-
 const { File } = require("../models");
-
 const router = express.Router();
-
 const { ensureAuth } = require("../middleware/auth");
 
+const multer = require("multer");
 const { customAlphabet } = require("nanoid");
 const alphabet =
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const nanoid = customAlphabet(alphabet, 8);
 
-const uploadDir = process.env.UPLOAD_DIR || "./uploads";
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: uploadDir,
-  filename: function (req, file, cb) {
-    const shortLinkId = nanoid();
-    const newFilename = shortLinkId + path.extname(file.originalname);
-    req.shortLink = shortLinkId;
-    cb(null, newFilename);
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  cb(null, true);
-};
+const storage = require("../services/storage");
 
 const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
+  storage: multer.memoryStorage(),
   limits: { fileSize: (process.env.MAX_FILE_SIZE_MB || 50) * 1024 * 1024 }, //MB to bytes
 });
 
-//router.post('/upload', ensureAuth, upload.single('file'), async (req, res) => {
 router.post("/upload", ensureAuth, async (req, res) => {
   upload.single("file")(req, res, async (err) => {
-    // This callback function now runs AFTER multer has finished or errored.
-
-    // Handle any potential Multer-specific errors first
     if (err instanceof multer.MulterError) {
-      // e.g., A file too large error
       console.error("Multer error during upload:", err);
       return res
         .status(400)
         .json({ error: "File upload error", details: err.message });
     } else if (err) {
-      // An unknown error occurred when uploading.
       console.error("An unknown error occurred during the upload process", err);
       return res.status(500).json({ error: "An unknown error occurred" });
     }
-
     try {
-      if (!req.file) {
+      const file = req.file;
+      if (!file) {
         return res.status(400).json({ error: "No file uploaded" });
       }
       let shortlink;
@@ -70,13 +43,16 @@ router.post("/upload", ensureAuth, async (req, res) => {
           isUnique = true;
         }
       }
+
+      const filepath = await storage.uploadFile(file, shortlink);
+
       const fileRecord = await File.create({
-        originalName: req.file.originalname,
-        storedName: req.file.filename,
+        originalName: file.originalname,
+        storedName: shortlink + path.extname(file.originalname),
         shortlink: shortlink,
-        filePath: req.file.path,
-        mimeType: req.file.mimetype,
-        fileSize: req.file.size,
+        filePath: filepath,
+        mimeType: file.mimetype,
+        fileSize: file.size,
         userId: req.user.id,
       });
 
@@ -147,19 +123,16 @@ router.get("/:shortlink", async (req, res) => {
       return res.status(404).json({ error: "File not found" });
     }
 
-    if (!fs.existsSync(file.filePath)) {
-      return res.status(404).json({ error: "File not found" });
-    }
+    const storageResponse = await storage.getFile(file);
 
     res.setHeader("Content-Type", file.mimeType || "application/octet-stream");
     res.setHeader(
       "Content-Disposition",
-      `inline; filename="${file.originalName}"`,
+      `inline; filename="${file.storedName}"`
     );
     res.setHeader("Content-Length", file.fileSize);
 
-    const fileStream = fs.createReadStream(file.filePath);
-    fileStream.pipe(res);
+    storageResponse.stream.pipe(res);
   } catch (error) {
     console.error("Error serving file:", error);
     res.status(500).json({ error: "Error serving file" });
@@ -175,16 +148,10 @@ router.delete("/:shortlink", async (req, res) => {
     if (!file) {
       return res.status(404).json({ error: "File not found" });
     }
-
-    if (!fs.existsSync(file.filePath)) {
-      return res.status(404).json({ error: "File not found" });
+    if (file.userId !== req.user.id) {
+      return res.status(403).json({ error: "Forbidden" });
     }
-
-    try {
-      await fs.unlink(file.path);
-    } catch (error) {
-      console.error("Error deleting physical file:", error);
-    }
+    await storage.deleteFile(file);
 
     await file.destroy();
 
