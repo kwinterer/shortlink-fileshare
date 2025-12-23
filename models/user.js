@@ -23,7 +23,6 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         allowNull: true,
         validate: {
-          // Custom validator for OAuth users
           isRequiredForOAuth(value) {
             if (this.type === 'oauth' && !value) {
               throw new Error('googleId is required for OAuth users');
@@ -44,12 +43,6 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       },
-      accessCode:{
-        type: DataTypes.STRING,
-        unique: true,
-        defaultValue: null,
-        allowNull: true
-      },
       lastLogin: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
@@ -59,14 +52,10 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "users",
       timestamps: true,
       validate: {
-        // Model-level validator
         guestOrOAuth() {
-          // OAuth users MUST have googleId and email
           if (this.type === 'oauth' && (!this.googleId || !this.email)) {
             throw new Error('OAuth users must have both googleId and email');
           }
-
-          // Guest users MUST NOT have googleId or email
           if (this.type === 'guest' && (this.googleId || this.email)) {
             throw new Error('Guest users cannot have googleId or email');
           }
@@ -75,7 +64,6 @@ module.exports = (sequelize, DataTypes) => {
     },
   );
 
-    // Add custom instance methods
   User.prototype.isGuestUser = function() {
     return this.type === 'guest';
   };
@@ -95,6 +83,10 @@ module.exports = (sequelize, DataTypes) => {
 
   User.associate = function (models) {
     User.hasMany(models.File, { foreignKey: "userId", as: "files", onDelete: 'CASCADE' });
+  };
+
+  User.associate = function (models) {
+    User.hasOne(models.AccessCode, { foreignKey: "userId", as: "accessCode", onDelete: 'CASCADE' });
   };
 
   return User;

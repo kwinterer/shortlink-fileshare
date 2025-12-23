@@ -1,30 +1,31 @@
 const express = require("express");
 const passport = require("passport");
 const router = express.Router();
-const { User } = require("../models");
+const { User, AccessCode } = require("../models");
 
 const { nanoid } = require('nanoid');
-// Validate access code
-function isValidAccessCode(code) {
-  const validCodes = process.env.ACCESS_CODES.split(',').map(c => c.trim());
-  return validCodes.includes(code);
-}
+const accessCode = require("../models/accessCode");
 
 // Guest login
 router.post('/guest', async (req, res) => {
   try {
     const { guestCode } = req.body;
-    
-    if (guestCode !== process.env.GUEST_CODE) {
-      return res.status(401).json({ error: 'Invalid guest code' });
-    }
 
-    // Create temporary guest user
+    const guestCodeRecord = await AccessCode.findOne({
+      where: {
+        id: guestCode,
+        type: 'GuestCode',
+        userId: null
+      }
+    });
+
     const guestUserName = `Guest-${nanoid(6)}`;
     const guestUser = await User.create({
       type: 'guest',
       name: guestUserName
     });
+
+    await guestCodeRecord.setUser(guestUser);
 
     req.login(guestUser, (err) => {
       if (err) {
@@ -60,9 +61,7 @@ router.get(
     session: false
   }),
   (req, res) => {
-    // Check if this is a new user requiring access code
     if (req.user.isNewUser) {
-      // Store profile in session temporarily
       req.session.pendingUser = req.user.profile;
       return res.redirect('/?requireAccessCode=true');
     } 
@@ -76,7 +75,6 @@ router.get(
   },
 );
 
-// Complete registration with access code
 router.post('/complete-registration', async (req, res) => {
   try {
     const { accessCode } = req.body;
@@ -85,23 +83,27 @@ router.post('/complete-registration', async (req, res) => {
     if (!pendingUser) {
       return res.status(400).json({ error: 'No pending registration found' });
     }
-
-    if (!isValidAccessCode(accessCode)) {
+    const accessCodeRecord = await AccessCode.findOne({
+      where: {
+        id: accessCode,
+        type: 'AccessCode',
+        userId: null
+      }
+    });
+    if (accessCodeRecord === null) {
       return res.status(401).json({ error: 'Invalid access code' });
     }
 
-    // Create the user
     const user = await User.create({
       type: 'oauth',
       googleId: pendingUser.googleId,
-      email: pendingUser.email,
-      accessCode: accessCode
+      email: pendingUser.email
     });
 
-    // Clear pending user from session
+    await accessCodeRecord.setUser(user);
+
     delete req.session.pendingUser;
 
-    // Log the user in
     req.login(user, (err) => {
       if (err) {
         return res.status(500).json({ error: 'Login failed' });

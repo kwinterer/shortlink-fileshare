@@ -3,7 +3,7 @@ const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
 const path = require("path");
-const { File, sequelize } = require("./models");
+const { sequelize } = require("./models");
 
 const authRoutes = require("./routes/auth");
 const fileRoutes = require("./routes/file");

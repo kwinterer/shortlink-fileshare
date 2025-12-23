@@ -36,7 +36,7 @@ class StorageService {
           Bucket: this.bucket,
           Key: key,
           Body: file.buffer,
-          ContentType: file.mimeType,
+          ContentType: file.mimetype,
         })
       );
 

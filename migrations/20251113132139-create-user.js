@@ -26,12 +26,6 @@ module.exports = {
         allowNull: true,
         unique: true,
       },
-      accessCode:{
-        type: Sequelize.STRING,
-        unique: true,
-        defaultValue: null,
-        allowNull: true
-      },
       lastLogin: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
