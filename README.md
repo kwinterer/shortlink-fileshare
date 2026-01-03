@@ -11,7 +11,10 @@ Node.js/Express.js application with Google OAuth authentication and short url ge
 - 📤 **Drag & Drop Upload**
 - 🔗 **Shortlink Generation**
 - 📊 **File Management Dashboard**
-- 🗄️ **Database Agnostic** - SQLite for development, easily switch to PostgreSQL/MySQL
+- 🗄️ **Database Agnostic** - SQLite for development, easily switch to PostgreSQL
+- ☁️ **Flexable Hosting** - Deploy locally, hybrid, or AWS
+- 💾 **Storage Options** - local filesystem, MinIO, or AWS S3
+- ⚖️ **Scalable** - Can be scaled for small to medium workloads
 - 🚀 **Dockerfile included**
 ### Prerequisites
 
@@ -36,11 +39,33 @@ Node.js/Express.js application with Google OAuth authentication and short url ge
     ```HOST=
     PORT=
     SESSION_SECRET=some secret string like a guid
+
+    #Google
     GOOGLE_CLIENT_ID=
     GOOGLE_CLIENT_SECRET=
     GOOGLE_CALLBACK_URL=
-    DATABASE_PATH=path to db
-    UPLOAD_DIR=where to save files locally
+
+    #Database
+    DATABASE_TYPE=sqlite or postgres
+    DATABASE_SQLITE_PATH=path to sqlite db (if using sqlite)
+    DATABASE_POSTGRES_NAME=
+    DATABASE_POSTGRES_USER=
+    DATABASE_POSTGRES_PASSWORD=
+    DATABASE_POSTGRES_HOST=
+
+    #Storage
+    STORAGE_TYPE=local, aws, or minio
+    UPLOAD_DIR=where to save files locally (if you chose to go locally)
+    MINIO_ENDPOINT=
+    MINIO_REGION=us-east-1 (or your chose of region)
+    MINIO_ACCESS_KEY=
+    MINIO_SECRET_KEY=
+    MINIO_BUCKET=
+    AWS_REGION=us-east-2 (or your chose of region)
+    AWS_ACCESS_KEY_ID=
+    AWS_SECRET_ACCESS_KEY=
+    AWS_S3_BUCKET=
+    
     MAX_FILE_SIZE_MB=
     ```
 
