@@ -6,7 +6,6 @@ const { User, AccessCode } = require("../models");
 const { nanoid } = require('nanoid');
 const accessCode = require("../models/accessCode");
 
-// Guest login
 router.post('/guest', async (req, res) => {
   try {
     const { guestCode } = req.body;
