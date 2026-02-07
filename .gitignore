@@ -6,6 +6,7 @@ node_modules/
 
 # Deployment
 k8s/
+devDocker/
 
 # Logs
 npm-debug.log*
